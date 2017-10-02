@@ -28,6 +28,15 @@
                 </item>
             </argument>
         </actionsColumn> -->
+        <column name="attributename" class="Speedex\Shipment\Ui\Component\Listing\Column\OrderShipment">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">AttributeName</item>
+                    <item name="sortOrder" xsi:type="number">1</item>
+                </item>
+            </argument>
+        </column>
     </columns>
     <listingToolbar name="listing_top">
         <massaction name="listing_massaction">
