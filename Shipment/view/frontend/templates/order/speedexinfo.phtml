@@ -1,0 +1,10 @@
+<?php $_order = $block->getOrder() ?>
+<div class="block block-order-details-view">
+	<div class="block-title">
+        <strong><?php /* @escapeNotVerified */ echo __('Speedex Information') ?></strong>
+    </div>
+    <div class="block-content">
+    	<span><?php /* @escapeNotVerified */ echo __('Voucher Id') ?>:&nbsp;</span>
+    	<span><?php /* @escapeNotVerified */ echo $_order->getVoucherId() ?></span>
+    </div>
+</div>

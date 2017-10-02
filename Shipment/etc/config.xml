@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <carriers>
+            <speedex>
+                <active>1</active>
+                <sallowspecific>0</sallowspecific>
+                <model>Speedex\Shipment\Model\Carrier\Speedex</model>
+                <name>Speedex Shipping Method</name>
+                <apiurl>http://www.speedex.gr/AccessPointTest/AccessPoint.asmx</apiurl>
+                <price>15.00</price>
+                <title>Speedex Shipping</title>
+                <type>I</type>
+                <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+            </speedex>
+        </carriers>
+    </default>
+</config>
