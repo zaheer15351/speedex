@@ -229,7 +229,7 @@ class Data extends AbstractHelper
 	private function getSpeedexConfigData ($type) {
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $_scopeConfig = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface');
-        $data =  $_scopeConfig->getValue('carriers/speedex/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
+        $data =  $_scopeConfig->getValue('speedex/general/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
         return $data;
 	}
 	private function executeApi ($xml_post_string) {
