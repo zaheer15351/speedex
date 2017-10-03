@@ -28,7 +28,7 @@
                 </item>
             </argument>
         </actionsColumn> -->
-        <column name="attributename" class="Speedex\Shipment\Ui\Component\Listing\Column\OrderShipment">
+        <!-- <column name="attributename" class="Speedex\Shipment\Ui\Component\Listing\Column\OrderShipment">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="bodyTmpl" xsi:type="string">ui/grid/cells/html</item>
@@ -37,7 +37,16 @@
                     <item name="sortOrder" xsi:type="number">1</item>
                 </item>
             </argument>
-        </column>
+        </column> -->
+        <actionsColumn name="actions" class="Speedex\Shipment\Ui\Component\Listing\Column\ViewAction">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="indexField" xsi:type="string">entity_id</item>
+                    <item name="viewUrlPath" xsi:type="string">sales/order/view</item>
+                    <item name="urlEntityParamName" xsi:type="string">order_id</item>
+                </item>
+            </argument>
+        </actionsColumn>
     </columns>
     <listingToolbar name="listing_top">
         <massaction name="listing_massaction">

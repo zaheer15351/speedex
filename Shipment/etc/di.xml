@@ -3,4 +3,6 @@
     <preference for="Magento\Sales\Block\Adminhtml\Order\View\Info" type="Speedex\Shipment\Block\Adminhtml\Order\View\Info"/>
     <preference for="\Magento\Sales\Block\Order\History" type="Speedex\Shipment\Block\Order\History"/>
     <preference for="\Magento\Sales\Block\Order\Recent" type="Speedex\Shipment\Block\Order\Recent"/>
+    <preference for="Magento\Sales\Ui\Component\Listing\Column\ViewAction"
+                type="Speedex\Shipment\Ui\Component\Listing\Column\ViewAction" />
 </config>
