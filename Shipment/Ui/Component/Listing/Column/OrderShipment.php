@@ -5,7 +5,7 @@ namespace Speedex\Shipment\Ui\Component\Listing\Column;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
-use \Magento\Ui\Component\Listing\Columns\Column;
+use Magento\Ui\Component\Listing\Columns\Column;
 
 /**
  * Class OrderShipment
@@ -41,7 +41,6 @@ class OrderShipment extends Column {
      * @return array
      */
 
-    /*<a class="action-menu-item" data-bind="attr: {target: $col.getTarget($action()), href: $action().href}, text: $action().label, click: $col.getActionHandler($action())" data-repeat-index="0" target="_self" href="http://localhost/magento2/admin/sales/order/view/order_id/2/key/791c5088035266258640cd4fe353d67138e76c814db0911dc06b7ba9ad5b9d9a/">View</a>*/
     public function prepareDataSource(array $dataSource){
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as & $item) {
@@ -52,14 +51,10 @@ class OrderShipment extends Column {
                             'order_id' => $item['entity_id']
                         ]
                     );
-                    $item[$this->getData('name')] = '<a class="action-menu-item" href="'.$url.'">link</a>';
+                    $item[$this->getData('name')] = '<a class="action-menu-item" href="'.$url.'">'.__('Link').'</a>';
                 }
             }
         }
-
-        /*echo "<pre>";
-        print_r($dataSource);
-        echo "</pre>";exit;*/
 
         return $dataSource;
     }

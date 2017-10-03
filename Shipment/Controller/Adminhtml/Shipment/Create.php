@@ -15,6 +15,6 @@ class Create extends Action {
      * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute() {
-        echo $this->getRequest()->getParam('entity_id');
+        echo $this->getRequest()->getParam('order_id');
     }
 }
