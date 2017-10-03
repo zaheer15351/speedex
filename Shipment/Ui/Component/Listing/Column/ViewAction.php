@@ -53,30 +53,47 @@ class ViewAction extends Column
                 if (isset($item['entity_id'])) {
                     $viewUrlPath = $this->getData('config/viewUrlPath') ?: '#';
                     $urlEntityParamName = $this->getData('config/urlEntityParamName') ?: 'entity_id';
-                    $item[$this->getData('name')] = [
-                        'view' => [
-                            'href' => $this->urlBuilder->getUrl(
-                                $viewUrlPath,
-                                [
-                                    $urlEntityParamName => $item['entity_id']
-                                ]
-                            ),
-                            'label' => __('View')
-                        ],
-                        'delete' => [
-                            'href' => $this->urlBuilder->getUrl(
-                                'speedex/shipment/create',
-                                [
-                                    'order_id' => $item['entity_id']
-                                ]
-                            ),
-                            'label' => __('Link'),
-                            /*'confirm' => [
-                                'title' => __('Delete "${ $.$data.title }"'),
-                                'message' => __('Are you sure you wan\'t to delete a "${ $.$data.title }" record?')
-                            ]*/
-                        ]
-                    ];
+                    $buttonsArray = array();
+                    $orderId = $item['entity_id'];
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
+                    $order = $orderModel->load($orderId);
+                    $orderState = $order->getState();
+                    $isCreateShipmentVisible = !($orderState=="canceled" || $orderState=="closed" || $orderState=="complete" || $orderState=="processing"); 
+                    $isCancelShipmentVisible = ($orderState=="processing"); 
+                    $buttonsArray["view"] = array(
+                                                'href' => $this->urlBuilder->getUrl(
+                                                    $viewUrlPath,
+                                                    [
+                                                        $urlEntityParamName => $item['entity_id']
+                                                    ]
+                                                ),
+                                                'label' => __('View')
+                                                );
+                    if($isCreateShipmentVisible) {
+                        $buttonsArray["create_ship"] = array(
+                                                'href' => $this->urlBuilder->getUrl(
+                                                    'speedex/shipment/create',
+                                                    [
+                                                        'order_id' => $item['entity_id']
+                                                    ]
+                                                ),
+                                                'label' => __('Create Shipment'),
+                                                );
+                    }
+                    if($isCancelShipmentVisible) {
+                        $buttonsArray["cancel_ship"] = array(
+                                                'href' => $this->urlBuilder->getUrl(
+                                                    'speedex/shipment/cancel',
+                                                    [
+                                                        'order_id' => $item['entity_id']
+                                                    ]
+                                                ),
+                                                'label' => __('Cancel Shipment'),
+                                                );
+                    }
+                    
+                    $item[$this->getData('name')] = $buttonsArray;
                 }
             }
         }

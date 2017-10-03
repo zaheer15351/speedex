@@ -20,14 +20,14 @@
                 </item>
             </argument>
         </actionsColumn> -->
-        <!-- <actionsColumn name="voucher_id" class="Speedex\Shipment\Ui\Component\Listing\Column\Voucher">
+        <column name="voucher_id" class="Speedex\Shipment\Ui\Component\Listing\Column\Voucher">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="indexField" xsi:type="string">entity_id</item>
                     <item name="label" xsi:type="string" translate="true">Voucher Id</item>
                 </item>
             </argument>
-        </actionsColumn> -->
+        </column>
         <!-- <column name="attributename" class="Speedex\Shipment\Ui\Component\Listing\Column\OrderShipment">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -50,12 +50,21 @@
     </columns>
     <listingToolbar name="listing_top">
         <massaction name="listing_massaction">
-            <action name="delete">
+            <action name="create_ship">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
                         <item name="type" xsi:type="string">delete</item>
-                        <item name="label" xsi:type="string" translate="true">Delete</item>
-                        <item name="url" xsi:type="url" path="sales/order/massDelete"/>
+                        <item name="label" xsi:type="string" translate="true">Create Shipment</item>
+                        <item name="url" xsi:type="url" path="speedex/shipment/create"/>
+                    </item>
+                </argument>
+            </action>
+            <action name="cancel_ship">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="type" xsi:type="string">delete</item>
+                        <item name="label" xsi:type="string" translate="true">Cancel Shipment</item>
+                        <item name="url" xsi:type="url" path="speedex/shipment/cancel"/>
                     </item>
                 </argument>
             </action>

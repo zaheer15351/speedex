@@ -12,6 +12,9 @@ class Data extends AbstractHelper
 
 		$username = $this->getSpeedexConfigData("username");
 		$password = $this->getSpeedexConfigData("password");
+		if($username=="" || $password=="") {
+			$this->throwException("Speedex is not properly configured, please contact support.");
+		}
 		// $password = "d" ;
         $xml_post_string  = 
 		'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spe="http://www.speedex.gr/">
@@ -31,6 +34,7 @@ class Data extends AbstractHelper
 			// throw exception
 			$this->throwException("An error has occured while processing with speedex, please contact support.");
 		}
+
 		return $sessionId;
 
 	}
@@ -272,6 +276,7 @@ class Data extends AbstractHelper
         return $this->parseXML($response)->soap_Body;
 
 	} 
+
 
 	private function parseXML($xml) {
         $obj = SimpleXML_Load_String($xml);
