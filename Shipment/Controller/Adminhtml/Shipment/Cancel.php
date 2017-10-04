@@ -16,53 +16,78 @@ class Cancel extends Action {
      * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute() {
+        // var_dump($this->getRequest()->getParam('order_id'));exit;
         $isSingleAction = ($this->getRequest()->getParam('order_id')) ? true : false; 
         if($isSingleAction) { // single item is clicked
             $orderId = $this->getRequest()->getParam('order_id');
-            $this->CancelShipmentForOrder($orderId);
-            $shimentText = "Shipment";
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
+            $order = $orderModel->load($orderId);
+            $orderState = $order->getState();
+            $isCancelShipmentVisible = ($orderState=="processing"); 
+            if(!$isCancelShipmentVisible){
+                $this->messageManager->addError(__('Shipment cannot be cancelled for order number '.$order->getIncrementId().'.'));
+                $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+                $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+                return $resultRedirect;
+            } else {
+                $this->CancelShipmentForOrder($orderId);
+                $this->messageManager->addSuccess(__('Shipment cancelled successfully for order number '.$order->getIncrementId().'.'));
+                $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+                $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+                return $resultRedirect;
+            }
             
         } else { // single or bulk items are selected
-            $shimentText = "Shipment(s)";
             $orderIds = (array)$this->getRequest()->getPost();
+            $notCancellable = array();
+            $cancellable = array();
             foreach ($orderIds["selected"] as $key => $id) {
-                $this->CancelShipmentForOrder($id);
+                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
+                $order = $orderModel->load($id);
+                $orderState = $order->getState();
+                $isCancelShipmentVisible = ($orderState=="processing"); 
+                if(!$isCancelShipmentVisible){
+                    $notCancellable[] = $order->getIncrementId();
+                } else {
+                    $this->CancelShipmentForOrder($id);
+                    $cancellable[] = $order->getIncrementId();
+                }
             }
+            // var_dump($notCancellable, $cancellable);exit;
+
+            if(sizeof($notCancellable)>0) {
+                $errorText = "Shipment(s) cannot be cancelled for order number(s) ".implode($notCancellable, ", ");
+                $this->messageManager->addError(__($errorText));
+            }
+            if(sizeof($cancellable)>0) {
+                $errorText = "Shipment(s) cancelled successfully for order number(s) ".implode($cancellable, ", ");
+                $this->messageManager->addSuccess(__($errorText));
+            }
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+            return $resultRedirect;
         }
-        $this->messageManager->addSuccess(__($shimentText.' cancelled successfully.'));
-        $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $resultRedirect->setUrl($this->_redirect->getRefererUrl());
-        return $resultRedirect;
     }
     private function CancelShipmentForOrder($orderId)
     {
 
-        $order = $observer->getEvent()->getOrder();
-        $logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('CancelShipmentForOrder');
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-
-        if ($order->getShippingMethod()=="speedex_speedex") {
-            $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
-            $sessionId = $helper->getSpeedexSessionId();
-            $helper->cancelShipment($sessionId, $order->getVoucherId());
-            $helper->destroySession($sessionId);
-        }
-
-        $logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('CancelShipmentForOrder');
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
+        $helper->writeLogs("CancelShipmentForOrder");
+        /*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('CancelShipmentForOrder');*/
         $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
         $order = $orderModel->load($orderId);
         // var_dump($order->getData());exit;
 
-        $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
         $sessionId = $helper->getSpeedexSessionId();
         $helper->cancelShipment($sessionId, $order->getVoucherId());
         $helper->destroySession($sessionId);
         try {
             $order->setVoucherId("");
-            $order->setState("holded")->setStatus("shipment_cancelled");
+            $order->setState("holded")->setStatus("holded");
             $order->save();
             
         } catch (Exception $e) {

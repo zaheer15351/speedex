@@ -53,7 +53,7 @@
             <action name="create_ship">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
-                        <item name="type" xsi:type="string">delete</item>
+                        <item name="type" xsi:type="string">create_ship</item>
                         <item name="label" xsi:type="string" translate="true">Create Shipment</item>
                         <item name="url" xsi:type="url" path="speedex/shipment/create"/>
                     </item>
@@ -62,7 +62,7 @@
             <action name="cancel_ship">
                 <argument name="data" xsi:type="array">
                     <item name="config" xsi:type="array">
-                        <item name="type" xsi:type="string">delete</item>
+                        <item name="type" xsi:type="string">cancel_ship</item>
                         <item name="label" xsi:type="string" translate="true">Cancel Shipment</item>
                         <item name="url" xsi:type="url" path="speedex/shipment/cancel"/>
                     </item>

@@ -10,10 +10,12 @@ Class OrderCancelAfter implements ObserverInterface
 	public function execute(Observer $observer)
     {
         /* Start: Cancel shipment when the order is cancelled */
-        $order = $observer->getEvent()->getOrder();
-        $logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('OrderCancelAfter');
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
+        $order = $observer->getEvent()->getOrder();
+        /*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('OrderCancelAfter');*/
+        $helper->writeLogs("OrderCancelAfter");
 
         if ($order->getShippingMethod()=="speedex_speedex") {
             $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');

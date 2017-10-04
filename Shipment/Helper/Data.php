@@ -7,9 +7,9 @@ class Data extends AbstractHelper
 {
 	
 	public function getSpeedexSessionId() { 
-       	$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('getSpeedexSessionId');
-
+       	/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('getSpeedexSessionId');*/
+        $this->writeLogs("getSpeedexSessionId");
 		$username = $this->getSpeedexConfigData("username");
 		$password = $this->getSpeedexConfigData("password");
 		if($username=="" || $password=="") {
@@ -40,8 +40,9 @@ class Data extends AbstractHelper
 	}
 	public function createShipment($sessionId, $order)
 	{
-		$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('createShipment');
+		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('createShipment');*/
+        $this->writeLogs("createShipment");
        	
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 		$shippingAddress = $order->getShippingAddress();
@@ -185,8 +186,9 @@ class Data extends AbstractHelper
 	}
 	public function cancelShipment($sessionId, $voucherId)
 	{
-		$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('cancelShipment');
+		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('cancelShipment');*/
+        $this->writeLogs("cancelShipment");
 		$xml_post_string  =
 		'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spe="http://www.speedex.gr/">
 			<soapenv:Header/>
@@ -206,8 +208,9 @@ class Data extends AbstractHelper
 	}
 	public function destroySession($sessionId)
 	{
-		$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('destroySession');
+		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('destroySession');*/
+        $this->writeLogs("destroySession");
 		$xml_post_string  =
 		'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spe="http://www.speedex.gr/">
 			<soapenv:Header/>
@@ -269,13 +272,21 @@ class Data extends AbstractHelper
             "xml_post_string" => $xml_post_string,
             "response" => $formatedResponse
             );
-		$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug("executeApi: ". json_encode($logArray));
+		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug("executeApi: ". json_encode($logArray));*/
+        $this->writeLogs("executeApi: ". json_encode($logArray));
 
         curl_close($ch);
         return $this->parseXML($response)->soap_Body;
 
-	} 
+	}
+	public function writeLogs($data)
+	 {
+	 	$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/speedex.log');
+		$logger = new \Zend\Log\Logger();
+		$logger->addWriter($writer);
+		$logger->info($data);
+	 } 
 
 
 	private function parseXML($xml) {

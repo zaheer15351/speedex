@@ -60,7 +60,7 @@ class ViewAction extends Column
                     $order = $orderModel->load($orderId);
                     $orderState = $order->getState();
                     $isCreateShipmentVisible = !($orderState=="canceled" || $orderState=="closed" || $orderState=="complete" || $orderState=="processing"); 
-                    $isCancelShipmentVisible = ($orderState=="processing"); 
+                    $isCancelShipmentVisible = ($orderState=="processing" && $order->getVoucherId()!=""); 
                     $buttonsArray["view"] = array(
                                                 'href' => $this->urlBuilder->getUrl(
                                                     $viewUrlPath,

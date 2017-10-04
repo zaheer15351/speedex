@@ -38,7 +38,6 @@ class Create extends Action {
             }
             
         } else { // single or bulk items are selected
-            $shimentText = "Shipment(s)";
             $orderIds = (array)$this->getRequest()->getPost();
             $notCreateable = array();
             $createable = array();
@@ -74,19 +73,20 @@ class Create extends Action {
     private function CreateShipmentForOrder($orderId)
     {
 
-        $logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('CreateShipmentForOrder');
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
+        $helper->writeLogs("CreateShipmentForOrder");
+        /*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+        $logger->debug('CreateShipmentForOrder');*/
         $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
         $order = $orderModel->load($orderId);
         // var_dump($order->getData());exit;
-        $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
         $sessionId = $helper->getSpeedexSessionId();
         $voucherId = $helper->createShipment($sessionId, $order);
         // var_dump($voucherId);
         try {
             $order->setVoucherId($voucherId);
-            $order->setState("processing")->setStatus("shipment_created");
+            $order->setState("processing")->setStatus("processing");
             $order->save();
             $helper->destroySession($sessionId);
             
