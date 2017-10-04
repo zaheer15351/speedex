@@ -16,10 +16,19 @@ class Create extends Action {
      * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute() {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $_scopeConfig = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface');
+        $isSpeedexActive =  $_scopeConfig->getValue('speedex/general/active', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
+        if(!$isSpeedexActive) {
+            $this->messageManager->addError(__('Module is disabled'));
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+            return $resultRedirect;
+        }
+
         $isSingleAction = ($this->getRequest()->getParam('order_id')) ? true : false; 
         if($isSingleAction) { // single item is clicked
             $orderId = $this->getRequest()->getParam('order_id');
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
             $order = $orderModel->load($orderId);
             $orderState = $order->getState();
@@ -42,7 +51,6 @@ class Create extends Action {
             $notCreateable = array();
             $createable = array();
             foreach ($orderIds["selected"] as $key => $id) {
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
                 $order = $orderModel->load($id);
                 $orderState = $order->getState();

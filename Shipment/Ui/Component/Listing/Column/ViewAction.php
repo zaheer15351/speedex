@@ -70,28 +70,34 @@ class ViewAction extends Column
                                                 ),
                                                 'label' => __('View')
                                                 );
-                    if($isCreateShipmentVisible) {
-                        $buttonsArray["create_ship"] = array(
-                                                'href' => $this->urlBuilder->getUrl(
-                                                    'speedex/shipment/create',
-                                                    [
-                                                        'order_id' => $item['entity_id']
-                                                    ]
-                                                ),
-                                                'label' => __('Create Shipment'),
-                                                );
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $_scopeConfig = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface');
+                    $isSpeedexActive =  $_scopeConfig->getValue('speedex/general/active', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
+                    if($isSpeedexActive) {
+                        if($isCreateShipmentVisible) {
+                            $buttonsArray["create_ship"] = array(
+                                                    'href' => $this->urlBuilder->getUrl(
+                                                        'speedex/shipment/create',
+                                                        [
+                                                            'order_id' => $item['entity_id']
+                                                        ]
+                                                    ),
+                                                    'label' => __('Create Shipment'),
+                                                    );
+                        }
+                        if($isCancelShipmentVisible) {
+                            $buttonsArray["cancel_ship"] = array(
+                                                    'href' => $this->urlBuilder->getUrl(
+                                                        'speedex/shipment/cancel',
+                                                        [
+                                                            'order_id' => $item['entity_id']
+                                                        ]
+                                                    ),
+                                                    'label' => __('Cancel Shipment'),
+                                                    );
+                        }
                     }
-                    if($isCancelShipmentVisible) {
-                        $buttonsArray["cancel_ship"] = array(
-                                                'href' => $this->urlBuilder->getUrl(
-                                                    'speedex/shipment/cancel',
-                                                    [
-                                                        'order_id' => $item['entity_id']
-                                                    ]
-                                                ),
-                                                'label' => __('Cancel Shipment'),
-                                                );
-                    }
+                    
                     
                     $item[$this->getData('name')] = $buttonsArray;
                 }

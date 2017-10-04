@@ -16,11 +16,18 @@ class Cancel extends Action {
      * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute() {
-        // var_dump($this->getRequest()->getParam('order_id'));exit;
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $_scopeConfig = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface');
+        $isSpeedexActive =  $_scopeConfig->getValue('speedex/general/active', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
+        if(!$isSpeedexActive) {
+            $this->messageManager->addError(__('Module is disabled'));
+            $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+            $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+            return $resultRedirect;
+        }
         $isSingleAction = ($this->getRequest()->getParam('order_id')) ? true : false; 
         if($isSingleAction) { // single item is clicked
             $orderId = $this->getRequest()->getParam('order_id');
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
             $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
             $order = $orderModel->load($orderId);
             $orderState = $order->getState();
@@ -43,7 +50,6 @@ class Cancel extends Action {
             $notCancellable = array();
             $cancellable = array();
             foreach ($orderIds["selected"] as $key => $id) {
-                $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
                 $order = $orderModel->load($id);
                 $orderState = $order->getState();
@@ -55,7 +61,6 @@ class Cancel extends Action {
                     $cancellable[] = $order->getIncrementId();
                 }
             }
-            // var_dump($notCancellable, $cancellable);exit;
 
             if(sizeof($notCancellable)>0) {
                 $errorText = "Shipment(s) cannot be cancelled for order number(s) ".implode($notCancellable, ", ");

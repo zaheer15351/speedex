@@ -230,8 +230,13 @@ class Data extends AbstractHelper
 	}
 	private function throwException($message='')
 	{
-       	throw new \Magento\Framework\Exception\LocalizedException(__($message));
-       	return;
+       	// throw new \Magento\Framework\Exception\LocalizedException(__($message));
+       	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
+        $messageManager->addError(__($message));
+       	$resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+        $resultRedirect->setUrl($this->_redirect->getRefererUrl());
+        return $resultRedirect;
 	}
 	private function getSpeedexConfigData ($type) {
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();

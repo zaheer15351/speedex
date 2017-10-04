@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-  <event name="sales_order_place_after"> 
+  <!-- <event name="sales_order_place_after"> 
      <observer name="speedex_sales_order_place_after" instance="Speedex\Shipment\Observer\SalesOrderPlaceAfter" />
-  </event>
-  <!-- <event name="order_cancel_after"> 
-     <observer name="speedex_order_cancel_after" instance="Speedex\Shipment\Observer\OrderCancelAfter" />
   </event> -->
+  <event name="order_cancel_after"> 
+     <observer name="speedex_order_cancel_after" instance="Speedex\Shipment\Observer\OrderCancelAfter" />
+  </event>
   
 </config>
