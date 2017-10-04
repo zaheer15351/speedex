@@ -20,7 +20,7 @@ class Create extends Action {
         $_scopeConfig = $objectManager->get('Magento\Framework\App\Config\ScopeConfigInterface');
         $isSpeedexActive =  $_scopeConfig->getValue('speedex/general/active', \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
         if(!$isSpeedexActive) {
-            $this->messageManager->addError(__('Module is disabled'));
+            $this->messageManager->addError(__('Module is disabled.'));
             $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
             $resultRedirect->setUrl($this->_redirect->getRefererUrl());
             return $resultRedirect;
@@ -62,7 +62,6 @@ class Create extends Action {
                     $createable[] = $order->getIncrementId();
                 }
             }
-            // var_dump($notCreateable, $createable);exit;
 
             if(sizeof($notCreateable)>0) {
                 $errorText = "Shipment(s) cannot be created for order number(s) ".implode($notCreateable, ", ");
@@ -84,14 +83,10 @@ class Create extends Action {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
         $helper->writeLogs("CreateShipmentForOrder");
-        /*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('CreateShipmentForOrder');*/
         $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
         $order = $orderModel->load($orderId);
-        // var_dump($order->getData());exit;
         $sessionId = $helper->getSpeedexSessionId();
         $voucherId = $helper->createShipment($sessionId, $order);
-        // var_dump($voucherId);
         try {
             $order->setVoucherId($voucherId);
             $order->setState("processing")->setStatus("processing");

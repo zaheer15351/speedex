@@ -7,15 +7,12 @@ class Data extends AbstractHelper
 {
 	
 	public function getSpeedexSessionId() { 
-       	/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('getSpeedexSessionId');*/
         $this->writeLogs("getSpeedexSessionId");
 		$username = $this->getSpeedexConfigData("username");
 		$password = $this->getSpeedexConfigData("password");
 		if($username=="" || $password=="") {
 			$this->throwException("Speedex is not properly configured, please contact support.");
 		}
-		// $password = "d" ;
         $xml_post_string  = 
 		'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spe="http://www.speedex.gr/">
 			<soapenv:Header/>
@@ -40,17 +37,13 @@ class Data extends AbstractHelper
 	}
 	public function createShipment($sessionId, $order)
 	{
-		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('createShipment');*/
         $this->writeLogs("createShipment");
        	
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 		$shippingAddress = $order->getShippingAddress();
 		$paymentMethod = $order->getPayment()->getMethodInstance()->getCode();
 		$codAmount = ($paymentMethod=="cashondelivery") ? $order->getGrandTotal() : 0 ;
-		// print_r($orderAmount);exit;
         $countryName = $objectManager->create('\Magento\Directory\Model\Country')->load($shippingAddress->getCountryId())->getName();
-		// print_r($shippingAddress->getData());exit;
 		$branchId = $this->getSpeedexConfigData("branchid");
 		$customerId = $this->getSpeedexConfigData("customercode");
 		$agreementId = $this->getSpeedexConfigData("agreementcode");
@@ -186,8 +179,6 @@ class Data extends AbstractHelper
 	}
 	public function cancelShipment($sessionId, $voucherId)
 	{
-		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('cancelShipment');*/
         $this->writeLogs("cancelShipment");
 		$xml_post_string  =
 		'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spe="http://www.speedex.gr/">
@@ -204,12 +195,13 @@ class Data extends AbstractHelper
 		if($response->returnCode!="1"){
 			// throw exception
 			$this->throwException("An error has occured while processing with speedex, please contact support.");
+			return false;
+		} else {
+			return true;
 		}
 	}
 	public function destroySession($sessionId)
 	{
-		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('destroySession');*/
         $this->writeLogs("destroySession");
 		$xml_post_string  =
 		'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:spe="http://www.speedex.gr/">
@@ -230,13 +222,20 @@ class Data extends AbstractHelper
 	}
 	private function throwException($message='')
 	{
-       	// throw new \Magento\Framework\Exception\LocalizedException(__($message));
+
        	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
-        $messageManager->addError(__($message));
-       	$resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-        $resultRedirect->setUrl($this->_redirect->getRefererUrl());
-        return $resultRedirect;
+        $coreSession = $objectManager->get('\Magento\Backend\Model\Session');
+        if($coreSession->getOrderCancelCall()) {
+       		throw new \Magento\Framework\Exception\LocalizedException(__($message));
+       		return false;
+        } else {
+        	$coreSession->setOrderCancelCall(true);
+	        $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
+	        $messageManager->addError(__($message));
+	        header($_SERVER['HTTP_REFERER']);
+	        return false;
+        }
+        
 	}
 	private function getSpeedexConfigData ($type) {
 		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
@@ -277,8 +276,6 @@ class Data extends AbstractHelper
             "xml_post_string" => $xml_post_string,
             "response" => $formatedResponse
             );
-		/*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug("executeApi: ". json_encode($logArray));*/
         $this->writeLogs("executeApi: ". json_encode($logArray));
 
         curl_close($ch);

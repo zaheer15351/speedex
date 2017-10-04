@@ -38,8 +38,9 @@ class Cancel extends Action {
                 $resultRedirect->setUrl($this->_redirect->getRefererUrl());
                 return $resultRedirect;
             } else {
-                $this->CancelShipmentForOrder($orderId);
-                $this->messageManager->addSuccess(__('Shipment cancelled successfully for order number '.$order->getIncrementId().'.'));
+                if($this->CancelShipmentForOrder($orderId)) {
+                    $this->messageManager->addSuccess(__('Shipment cancelled successfully for order number '.$order->getIncrementId().'.'));
+                }
                 $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
                 $resultRedirect->setUrl($this->_redirect->getRefererUrl());
                 return $resultRedirect;
@@ -58,7 +59,11 @@ class Cancel extends Action {
                     $notCancellable[] = $order->getIncrementId();
                 } else {
                     $this->CancelShipmentForOrder($id);
-                    $cancellable[] = $order->getIncrementId();
+                    if($this->CancelShipmentForOrder($id)) {
+                        $cancellable[] = $order->getIncrementId();
+                    } else {
+                        $notCancellable[] = $order->getIncrementId();
+                    }
                 }
             }
 
@@ -81,14 +86,14 @@ class Cancel extends Action {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $helper = $objectManager->get('\Speedex\Shipment\Helper\Data');
         $helper->writeLogs("CancelShipmentForOrder");
-        /*$logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
-        $logger->debug('CancelShipmentForOrder');*/
         $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
         $order = $orderModel->load($orderId);
-        // var_dump($order->getData());exit;
 
         $sessionId = $helper->getSpeedexSessionId();
-        $helper->cancelShipment($sessionId, $order->getVoucherId());
+        $cancelled = $helper->cancelShipment($sessionId, $order->getVoucherId());
+        if(!$cancelled) {
+            return false;
+        }
         $helper->destroySession($sessionId);
         try {
             $order->setVoucherId("");

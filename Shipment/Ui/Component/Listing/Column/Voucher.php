@@ -27,7 +27,6 @@ class Voucher extends Column
                 $order  = $this->_orderRepository->get($item["entity_id"]);
                 $voucher_id = $order->getData("voucher_id");
 
-                // $this->getData('name') returns the name of the column so in this case it would return export_status
                 $item[$this->getData('name')] = $voucher_id;
             }
         }
