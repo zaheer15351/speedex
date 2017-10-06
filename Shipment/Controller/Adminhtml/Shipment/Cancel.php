@@ -58,7 +58,6 @@ class Cancel extends Action {
                 if(!$isCancelShipmentVisible){
                     $notCancellable[] = $order->getIncrementId();
                 } else {
-                    $this->CancelShipmentForOrder($id);
                     if($this->CancelShipmentForOrder($id)) {
                         $cancellable[] = $order->getIncrementId();
                     } else {
@@ -88,22 +87,26 @@ class Cancel extends Action {
         $helper->writeLogs("CancelShipmentForOrder");
         $orderModel = $objectManager->get('\Magento\Sales\Model\Order');
         $order = $orderModel->load($orderId);
+        $coreSession = $objectManager->get('\Magento\Backend\Model\Session');
+        $coreSession->setOrderCancelCall("no");
 
         $sessionId = $helper->getSpeedexSessionId();
         $cancelled = $helper->cancelShipment($sessionId, $order->getVoucherId());
+        $helper->destroySession($sessionId);
+        $helper->writeLogs("CancelShipmentForOrder - cancelled: ".($cancelled) ? "yes" : "no");
         if(!$cancelled) {
             return false;
         }
-        $helper->destroySession($sessionId);
         try {
             $order->setVoucherId("");
             $order->setState("holded")->setStatus("holded");
             $order->save();
+            return true;
             
         } catch (Exception $e) {
             // throw exception
             throw new \Magento\Framework\Exception\LocalizedException(__($e->getMessage()));
-            return;
+            return false;
         }
 
     }

@@ -194,7 +194,8 @@ class Data extends AbstractHelper
 		$returnCode = (string)$response->returnCode;
 		if($response->returnCode!="1"){
 			// throw exception
-			$this->throwException("An error has occured while processing with speedex, please contact support.");
+			// $this->throwException("An error has occured while processing with speedex, please contact support.");
+			$this->throwException((string)$response->returnMessage);
 			return false;
 		} else {
 			return true;
@@ -224,17 +225,10 @@ class Data extends AbstractHelper
 	{
 
        	$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $coreSession = $objectManager->get('\Magento\Backend\Model\Session');
-        if($coreSession->getOrderCancelCall()) {
-       		throw new \Magento\Framework\Exception\LocalizedException(__($message));
-       		return false;
-        } else {
-        	$coreSession->setOrderCancelCall(true);
-	        $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
-	        $messageManager->addError(__($message));
-	        header($_SERVER['HTTP_REFERER']);
-	        return false;
-        }
+        $messageManager = $objectManager->get('Magento\Framework\Message\ManagerInterface');
+        $messageManager->addError(__($message));
+        header($_SERVER['HTTP_REFERER']);
+        return false;
         
 	}
 	private function getSpeedexConfigData ($type) {
@@ -243,7 +237,7 @@ class Data extends AbstractHelper
         $data =  $_scopeConfig->getValue('speedex/general/'.$type, \Magento\Store\Model\ScopeInterface::SCOPE_WEBSITE);
         return $data;
 	}
-	private function executeApi ($xml_post_string) {
+	public function executeApi ($xml_post_string) {
 		$headers = array(
             "Content-type: text/xml;charset=\"utf-8\"",
             "Accept: text/xml",
